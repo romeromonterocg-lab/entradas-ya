@@ -107,8 +107,13 @@ export default function Evento() {
             <div className="lista-sectores">
               {evento.sectores.map((s) => {
                 const pct = s.cupo_total ? s.cupo_disponible / s.cupo_total : 0;
+                const elegible = usuario?.rol === 'cliente' && !resultado?.ok && s.cupo_disponible > 0;
                 return (
-                  <div key={s.id} className={`sector-fila ${s.cupo_disponible === 0 ? 'sin-cupo' : ''}`}>
+                  <div key={s.id}
+                    className={`sector-fila ${s.cupo_disponible === 0 ? 'sin-cupo' : ''} ${elegible ? 'elegible' : ''} ${sectorId === s.id ? 'elegido' : ''}`}
+                    onClick={elegible ? () => { setSectorId(s.id); setCantidad(1); } : undefined}
+                    role={elegible ? 'button' : undefined} tabIndex={elegible ? 0 : undefined}
+                    onKeyDown={elegible ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSectorId(s.id); setCantidad(1); } } : undefined}>
                     <div>
                       <strong>{s.nombre}</strong>
                       <div className="barra-cupo"><span style={{ width: `${pct * 100}%` }} className={pct < 0.2 ? 'poco' : ''} /></div>

@@ -311,6 +311,9 @@ button.peligro { background: var(--rojo); }
 .evento-compra { position: sticky; top: 90px; }
 .evento-compra .tarjeta-acceso h2 { font-size: 1.5rem; }
 .paso { margin: 6px 0 -4px; font-weight: 700; font-size: .92rem; }
+.sector-fila.elegible { cursor: pointer; transition: border-color .15s, background .15s; }
+.sector-fila.elegible:hover { border-color: var(--cian); background: #f6f2ff; }
+.sector-fila.elegido { border-color: var(--azul); background: #f1eaff; box-shadow: 0 0 0 3px rgba(109,40,217,.15); }
 .opciones-sector { display: flex; flex-direction: column; gap: 8px; }
 .opcion-sector {
   display: flex; justify-content: space-between; align-items: center; width: 100%;
