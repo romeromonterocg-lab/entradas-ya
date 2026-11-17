@@ -1,0 +1,18 @@
+{
+  "name": "entradasya-notifications",
+  "version": "1.0.0",
+  "description": "Servicio notifications de EntradasYa: correos a Mailpit por SMTP",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "nodemailer": "^6.9.16"
+  }
+}

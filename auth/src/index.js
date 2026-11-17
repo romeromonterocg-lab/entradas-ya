@@ -74,7 +74,8 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
     }
 
-    const token = jwt.sign({ sub: String(usuario.id), rol: usuario.rol }, config.jwtSecret, {
+    const token = jwt.sign(
+      { sub: String(usuario.id), rol: usuario.rol, correo: usuario.correo, nombre: usuario.nombre }, config.jwtSecret, {
       algorithm: 'HS256',
       expiresIn: config.jwtExpiresIn,
     });
