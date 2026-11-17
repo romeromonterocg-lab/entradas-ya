@@ -53,7 +53,7 @@ npm run crear-usuario -- "Pedro Portero" pedro@test.com 123456 portero
 
 ## Token (contrato con los demás servicios)
 - Algoritmo HS256, firmado con `JWT_SECRET`.
-- Payload: `{ "sub": <id>, "rol": "cliente" | "organizador" | "portero", "iat", "exp" }`.
+- Payload: `{ "sub": "<id como texto>", "rol": "cliente" | "organizador" | "portero", "iat", "exp" }`.
 - Los demás servicios lo validan por su cuenta con el mismo `JWT_SECRET`.
 
 ## Health check
