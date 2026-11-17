@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import TarjetaEvento from '../components/TarjetaEvento.jsx';
-import { TarjetaLogin } from './Acceso.jsx';
 
 const accesosPorRol = {
   cliente: [{ a: '/mis-entradas', texto: 'Mis entradas' }, { a: '/mis-compras', texto: 'Mis compras' }],
@@ -56,15 +55,16 @@ export default function Cartelera() {
           <p>Conciertos, espectáculos, deportes y mucho más...</p>
         </div>
         <svg className="hero-ola" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 70 C 320 140 620 0 960 50 S 1340 90 1440 30 V120 H0Z" fill="var(--fondo)" />
-          <path d="M0 90 C 380 150 700 30 1040 80 S 1360 100 1440 60" fill="none" stroke="#c9b5ff" strokeWidth="3" opacity=".7" />
+          <path d="M0 66 C 320 136 620 -4 960 46 S 1340 86 1440 26" fill="none" stroke="#c9b5ff" strokeWidth="3" opacity=".7" />
         </svg>
       </section>
 
-      <div className="portada-cuerpo">
-        <aside className="portada-lateral">
-          {usuario ? <Bienvenida usuario={usuario} /> : <TarjetaLogin />}
-        </aside>
+      <div className={`portada-cuerpo ${usuario ? '' : 'sin-lateral'}`}>
+        {usuario && (
+          <aside className="portada-lateral">
+            <Bienvenida usuario={usuario} />
+          </aside>
+        )}
 
         <div className="portada-principal">
           {error && <p className="error">{error}</p>}

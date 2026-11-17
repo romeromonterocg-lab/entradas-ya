@@ -55,9 +55,17 @@ const CUENTAS_PRUEBA = import.meta.env.DEV
     ]
   : [];
 
-// Tarjeta de inicio de sesión: se usa en la portada y en /login
-// quedarse = true: después de entrar se queda en la misma página (ej. el detalle del evento)
-export function TarjetaLogin({ quedarse = false, subtitulo = 'Accede a tu cuenta y compra tus entradas' }) {
+// Enlace del pie: dentro del modal cambia de tarjeta; fuera del modal navega
+function EnlaceCambio({ alCambiar, a, children }) {
+  return alCambiar
+    ? <button type="button" className="enlace" onClick={alCambiar}>{children}</button>
+    : <Link to={a}>{children}</Link>;
+}
+
+// Tarjeta de inicio de sesión (se muestra en la ventana emergente)
+// alEntrar: se llama al iniciar sesión (cierra la ventana). El cliente se queda en la página
+// donde estaba; organizador y portero van a su panel.
+export function TarjetaLogin({ alEntrar, alCambiar, subtitulo = 'Accede a tu cuenta y compra tus entradas' }) {
   const { entrar } = useAuth();
   const navegar = useNavigate();
   const [correo, setCorreo] = useState(CUENTAS_PRUEBA[0]?.correo || '');
@@ -73,7 +81,8 @@ export function TarjetaLogin({ quedarse = false, subtitulo = 'Accede a tu cuenta
     try {
       const r = await api('/auth/login', { method: 'POST', body: { correo, password } });
       entrar(r.token, recordar);
-      if (!quedarse || r.usuario.rol !== 'cliente') navegar(inicioPorRol[r.usuario.rol] || '/');
+      alEntrar?.();
+      if (r.usuario.rol !== 'cliente') navegar(inicioPorRol[r.usuario.rol] || '/');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -97,7 +106,7 @@ export function TarjetaLogin({ quedarse = false, subtitulo = 'Accede a tu cuenta
       </label>
       {error && <p className="error">{error}</p>}
       <button className="boton-grande" disabled={cargando}>{cargando ? 'Ingresando...' : 'Ingresar →'}</button>
-      <p className="acceso-pie">¿No tienes cuenta? <Link to="/registro">Regístrate</Link></p>
+      <p className="acceso-pie">¿No tienes cuenta? <EnlaceCambio alCambiar={alCambiar} a="/registro">Regístrate</EnlaceCambio></p>
       {CUENTAS_PRUEBA.length > 0 && (
         <div className="cuentas-prueba">
           <small>Cuentas de prueba (solo en desarrollo) · contraseña 123456</small>
@@ -115,17 +124,9 @@ export function TarjetaLogin({ quedarse = false, subtitulo = 'Accede a tu cuenta
   );
 }
 
-export function Login() {
-  return (
-    <div className="pagina-acceso">
-      <TarjetaLogin />
-    </div>
-  );
-}
-
-export function Registro() {
+// Tarjeta de registro (se muestra en la ventana emergente). Siempre crea un cliente.
+export function TarjetaRegistro({ alEntrar, alCambiar }) {
   const { entrar } = useAuth();
-  const navegar = useNavigate();
   const [datos, setDatos] = useState({ nombre: '', correo: '', password: '' });
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -139,7 +140,7 @@ export function Registro() {
       await api('/auth/register', { method: 'POST', body: datos });
       const r = await api('/auth/login', { method: 'POST', body: { correo: datos.correo, password: datos.password } });
       entrar(r.token, true);
-      navegar('/');
+      alEntrar?.();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -148,7 +149,6 @@ export function Registro() {
   }
 
   return (
-    <div className="pagina-acceso">
       <form className="tarjeta-acceso" onSubmit={enviar}>
         <div className="acceso-icono"><IconoEntrada tamaño={96} /></div>
         <h2>Crear cuenta</h2>
@@ -162,8 +162,7 @@ export function Registro() {
         <CampoPassword placeholder="Contraseña (mínimo 6)" minLength={6} value={datos.password} onChange={cambiar('password')} />
         {error && <p className="error">{error}</p>}
         <button className="boton-grande" disabled={cargando}>{cargando ? 'Creando cuenta...' : 'Registrarme →'}</button>
-        <p className="acceso-pie">¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link></p>
+        <p className="acceso-pie">¿Ya tienes cuenta? <EnlaceCambio alCambiar={alCambiar} a="/login">Inicia sesión</EnlaceCambio></p>
       </form>
-    </div>
   );
 }

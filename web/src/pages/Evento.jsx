@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api, dinero } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { tipoDe } from '../components/TarjetaEvento.jsx';
-import { TarjetaLogin } from './Acceso.jsx';
+import { useModalAcceso } from '../components/ModalAcceso.jsx';
 
 const IconoCalendario = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" strokeWidth="2" d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" /></svg>
@@ -23,6 +23,7 @@ const mayuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 export default function Evento() {
   const { id } = useParams();
   const { usuario } = useAuth();
+  const { abrir } = useModalAcceso();
   const [evento, setEvento] = useState(null);
   const [error, setError] = useState('');
   const [sectorId, setSectorId] = useState(null);
@@ -30,6 +31,7 @@ export default function Evento() {
   const [tarjeta, setTarjeta] = useState('');
   const [comprando, setComprando] = useState(false);
   const [resultado, setResultado] = useState(null);
+  const [imagenRota, setImagenRota] = useState(false);
 
   const cargar = () => api(`/events/eventos/${id}`).then(setEvento).catch((e) => setError(e.message));
   useEffect(() => { cargar(); }, [id]);
@@ -58,6 +60,7 @@ export default function Evento() {
 
   const fecha = new Date(evento.fecha);
   const tipo = tipoDe(evento.nombre);
+  const conImagen = evento.imagen_url && !imagenRota;
   const sector = evento.sectores.find((s) => s.id === sectorId);
   const maximo = Math.max(1, Math.min(6, sector?.cupo_disponible ?? 6));
   const agotado = evento.sectores.every((s) => s.cupo_disponible === 0);
@@ -69,10 +72,10 @@ export default function Evento() {
       <Link to="/" className="volver">← Volver a la cartelera</Link>
 
       {/* Cabecera del evento */}
-      <section className={`evento-cabecera ${evento.imagen_url ? '' : tipo.clase}`}>
-        {evento.imagen_url && <img src={evento.imagen_url} alt="" className="evento-cabecera-img" />}
+      <section className={`evento-cabecera ${conImagen ? '' : tipo.clase}`}>
+        {conImagen && <img src={evento.imagen_url} alt="" className="evento-cabecera-img" onError={() => setImagenRota(true)} />}
         <div className="evento-cabecera-velo" />
-        {!evento.imagen_url && <span className="evento-cabecera-icono" aria-hidden="true">{tipo.icono}</span>}
+        {!conImagen && <span className="evento-cabecera-icono" aria-hidden="true">{tipo.icono}</span>}
         <div className="evento-cabecera-texto">
           <div className="fecha-chip grande">
             <small>{fecha.toLocaleDateString('es-BO', { weekday: 'short' }).replace('.', '').toUpperCase()}.</small>
@@ -132,7 +135,14 @@ export default function Evento() {
         {/* Compra */}
         <aside className="evento-compra">
           {!usuario && (
-            <TarjetaLogin quedarse subtitulo="Inicia sesión para comprar tus entradas" />
+            <div className="tarjeta-acceso">
+              <h2>Comprar entradas</h2>
+              <p className="acceso-sub">Inicia sesión o crea tu cuenta gratis para comprar tus entradas.</p>
+              <button type="button" className="boton-grande" onClick={() => abrir('login')}>Iniciar sesión →</button>
+              <p className="acceso-pie">¿No tienes cuenta?{' '}
+                <button type="button" className="enlace" onClick={() => abrir('registro')}>Regístrate</button>
+              </p>
+            </div>
           )}
 
           {usuario && usuario.rol !== 'cliente' && (

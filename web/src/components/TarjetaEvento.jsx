@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { dinero } from '../api.js';
 
 // Si el evento no tiene imagen, se elige un fondo e ícono según el tipo de evento
 const TIPOS = [
@@ -21,9 +20,11 @@ export default function TarjetaEvento({ evento }) {
   const fecha = new Date(evento.fecha);
   const dia = fecha.toLocaleDateString('es-BO', { weekday: 'short' }).replace('.', '').toUpperCase();
   const mes = fecha.toLocaleDateString('es-BO', { month: 'short' }).replace('.', '').toUpperCase();
-  const desde = evento.sectores.length ? Math.min(...evento.sectores.map((s) => s.precio)) : null;
   const agotado = evento.sectores.every((s) => s.cupo_disponible === 0);
   const tipo = tipoDe(evento.nombre);
+  // Si la imagen no carga (enlace roto o que no es una imagen), se usa el fondo con ícono
+  const [imagenRota, setImagenRota] = useState(false);
+  const conImagen = evento.imagen_url && !imagenRota;
 
   function alternarFavorito(e) {
     e.preventDefault();
@@ -35,8 +36,10 @@ export default function TarjetaEvento({ evento }) {
 
   return (
     <Link to={`/eventos/${evento.id}`} className="tarjeta-evento">
-      <div className={`tarjeta-imagen ${evento.imagen_url ? '' : tipo.clase}`}>
-        {evento.imagen_url ? <img src={evento.imagen_url} alt="" /> : <span className="tarjeta-icono">{tipo.icono}</span>}
+      <div className={`tarjeta-imagen ${conImagen ? '' : tipo.clase}`}>
+        {conImagen
+          ? <img src={evento.imagen_url} alt="" onError={() => setImagenRota(true)} />
+          : <span className="tarjeta-icono">{tipo.icono}</span>}
         <div className="fecha-chip">
           <small>{dia}.</small>
           <strong>{String(fecha.getDate()).padStart(2, '0')}</strong>
@@ -57,7 +60,7 @@ export default function TarjetaEvento({ evento }) {
           {evento.lugar}
         </p>
         <div className="tarjeta-pie">
-          {desde != null && <span className="desde">Desde <b>{dinero(desde)}</b></span>}
+          <span className="desde">Hora <b>{fecha.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}</b></span>
           <span className="boton-comprar">{agotado ? 'Ver evento' : 'Comprar entradas'} →</span>
         </div>
       </div>
