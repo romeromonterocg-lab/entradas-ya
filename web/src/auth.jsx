@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
@@ -32,6 +32,18 @@ export function AuthProvider({ children }) {
     if (!u) borrarToken();
     return u || null;
   });
+
+  // Si en otra pestaña se inicia o cierra sesión, esta pestaña se actualiza también.
+  // (Así la pantalla nunca muestra a un usuario distinto del que manda las peticiones.)
+  useEffect(() => {
+    const alCambiar = (e) => {
+      if (e.key !== null && e.key !== 'token') return;
+      const t = leerTokenGuardado();
+      setUsuario((t && leerToken(t)) || null);
+    };
+    window.addEventListener('storage', alCambiar);
+    return () => window.removeEventListener('storage', alCambiar);
+  }, []);
 
   const entrar = (token, recordar = true) => {
     borrarToken();
