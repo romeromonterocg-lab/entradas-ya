@@ -18,20 +18,28 @@ function leerToken(token) {
   }
 }
 
+// "Recordarme" marcado -> localStorage (sigue al cerrar el navegador). Si no -> sessionStorage.
+export const leerTokenGuardado = () => localStorage.getItem('token') || sessionStorage.getItem('token');
+export const borrarToken = () => {
+  localStorage.removeItem('token');
+  sessionStorage.removeItem('token');
+};
+
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(() => {
-    const t = localStorage.getItem('token');
+    const t = leerTokenGuardado();
     const u = t && leerToken(t);
-    if (!u) localStorage.removeItem('token');
+    if (!u) borrarToken();
     return u || null;
   });
 
-  const entrar = (token) => {
-    localStorage.setItem('token', token);
+  const entrar = (token, recordar = true) => {
+    borrarToken();
+    (recordar ? localStorage : sessionStorage).setItem('token', token);
     setUsuario(leerToken(token));
   };
   const salir = () => {
-    localStorage.removeItem('token');
+    borrarToken();
     setUsuario(null);
   };
 

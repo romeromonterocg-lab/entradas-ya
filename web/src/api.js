@@ -12,7 +12,7 @@ function mensajeDeError(data, status) {
 export async function api(ruta, { method = 'GET', body, raw = false } = {}) {
   const headers = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   if (token) headers.Authorization = `Bearer ${token}`;
 
   let res;
@@ -25,6 +25,7 @@ export async function api(ruta, { method = 'GET', body, raw = false } = {}) {
   // Token vencido: cerrar sesión
   if (res.status === 401 && token) {
     localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     window.location.href = '/login';
   }
 
