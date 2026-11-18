@@ -108,7 +108,6 @@ export function TarjetaLogin({ alEntrar, alCambiar, subtitulo = 'Accede a tu cue
       <p className="acceso-pie">¿No tienes cuenta? <EnlaceCambio alCambiar={alCambiar} a="/registro">Regístrate</EnlaceCambio></p>
       {CUENTAS_PRUEBA.length > 0 && (
         <div className="cuentas-prueba">
-          <small>Cuentas de prueba · contraseña 123456</small>
           <div>
             {CUENTAS_PRUEBA.map((c) => (
               <button type="button" key={c.correo} className={correo === c.correo ? 'activa' : ''}
