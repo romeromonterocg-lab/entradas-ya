@@ -46,14 +46,13 @@ function CampoPassword({ value, onChange, placeholder = 'Contraseña', minLength
   );
 }
 
-// Cuentas de prueba: SOLO en desarrollo (npm run dev). En el build para el servidor no se incluyen.
-const CUENTAS_PRUEBA = import.meta.env.DEV
-  ? [
-      { rol: 'Organizador', correo: 'ana@test.com', password: '123456' },
-      { rol: 'Cliente', correo: 'prueba@test.com', password: '123456' },
-      { rol: 'Portero', correo: 'pedro@test.com', password: '123456' },
-    ]
-  : [];
+// Cuentas de prueba (proyecto de clase): botones para entrar rápido con cada rol.
+// Se muestran en desarrollo y también en el servidor de VirtualBox (solo accesible desde la laptop).
+const CUENTAS_PRUEBA = [
+  { rol: 'Organizador', correo: 'ana@test.com', password: '123456' },
+  { rol: 'Cliente', correo: 'prueba@test.com', password: '123456' },
+  { rol: 'Portero', correo: 'pedro@test.com', password: '123456' },
+];
 
 // Enlace del pie: dentro del modal cambia de tarjeta; fuera del modal navega
 function EnlaceCambio({ alCambiar, a, children }) {
@@ -109,7 +108,7 @@ export function TarjetaLogin({ alEntrar, alCambiar, subtitulo = 'Accede a tu cue
       <p className="acceso-pie">¿No tienes cuenta? <EnlaceCambio alCambiar={alCambiar} a="/registro">Regístrate</EnlaceCambio></p>
       {CUENTAS_PRUEBA.length > 0 && (
         <div className="cuentas-prueba">
-          <small>Cuentas de prueba (solo en desarrollo) · contraseña 123456</small>
+          <small>Cuentas de prueba · contraseña 123456</small>
           <div>
             {CUENTAS_PRUEBA.map((c) => (
               <button type="button" key={c.correo} className={correo === c.correo ? 'activa' : ''}
