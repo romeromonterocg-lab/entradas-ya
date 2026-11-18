@@ -1,0 +1,28 @@
+# Pipeline de EntradasYa: cada cambio en main actualiza el servidor Ubuntu.
+# Corre en un "self-hosted runner" instalado dentro del servidor (ver README).
+name: Desplegar en el servidor
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # permite lanzarlo a mano desde la pestaña Actions
+
+# Si llegan dos cambios seguidos, se despliegan de a uno
+concurrency:
+  group: despliegue
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    runs-on: self-hosted
+    timeout-minutes: 30
+    steps:
+      - name: Traer la última versión de main
+        run: |
+          cd "$HOME/entradas-ya"
+          git fetch origin main
+          git reset --hard origin/main
+          git log --oneline -1
+
+      - name: Compilar, reiniciar servicios y revisar /health
+        run: bash "$HOME/entradas-ya/deploy/desplegar.sh"

@@ -245,8 +245,8 @@ button.peligro { background: var(--rojo); }
 .aviso { border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
 .aviso h3 { margin: 0 0 6px; }
 .aviso p { margin: 4px 0; }
-.aviso.verde { background: #dcfce7; border: 1px solid #86efac; }
-.aviso.rojo { background: #fee2e2; border: 1px solid #fca5a5; }
+.aviso.verde { background: #dcfce7; border: 1px solid #86efac; color: #14532d; font-weight: 600; }
+.aviso.rojo { background: #fee2e2; border: 1px solid #fca5a5; color: #7f1d1d; }
 .etiqueta { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .75rem; font-weight: 700; margin-left: 6px; vertical-align: middle; text-transform: capitalize; }
 .etiqueta.verde { background: #dcfce7; color: var(--verde); }
 .etiqueta.roja { background: #fee2e2; color: var(--rojo); }
@@ -538,3 +538,6 @@ body {
     linear-gradient(#000, #000) top / 100% calc(100% - 108px) no-repeat,
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath fill-rule='evenodd' d='M0 0H1440V120H0Z M0 70 C 320 140 620 0 960 50 S 1340 90 1440 30 V120 H0Z'/%3E%3C/svg%3E") bottom / 100% 110px no-repeat;
 }
+
+/* Mensajes de error escritos directo sobre el fondo oscuro: rojo claro para que se lean */
+main > .error, main > div > .error, .portada-principal .error { color: #fca5a5; }

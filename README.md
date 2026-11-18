@@ -47,7 +47,10 @@ Requisitos: PostgreSQL, Node.js 20+, Python 3.12, Go 1.25+, .NET 8 SDK y Mailpit
 
 ## Despliegue en el servidor Ubuntu
 
-Servidor: AWS EC2, Ubuntu Server 24.04 LTS (t3.small + 2 GB de swap). Los scripts están en [deploy/](deploy/).
+Servidor: máquina virtual de **VirtualBox** con **Ubuntu Server 24.04 LTS** (4 GB de RAM, 2 CPU, 25 GB de disco).
+Red NAT con reenvío de puertos: `127.0.0.1:2222 → 22` (SSH) y `127.0.0.1:8088 → 80` (web).
+La plataforma se abre en **http://localhost:8088** y los correos en **http://localhost:8088/mailpit/**.
+(Antes estuvo en AWS EC2; los mismos scripts sirven para cualquier Ubuntu.) Los scripts están en [deploy/](deploy/).
 
 1. **Programas** (una vez): `git`, `postgresql`, `nginx`, Node.js 22, `python3-venv`, `dotnet-sdk-8.0`, Go (desde go.dev) y Mailpit.
 2. **Código**: `git clone git@github.com:romeromonterocg-lab/entradas-ya.git` (con una Deploy key de solo lectura).
@@ -68,6 +71,22 @@ Los servicios se llaman `entradasya-<servicio>` en systemd y arrancan solos al e
 Ver logs: `journalctl -u entradasya-orders -f`.
 
 Si la IP pública cambia (al detener y encender la instancia), volver a ejecutar el paso 3 con la nueva IP.
+
+## Pipeline (GitHub Actions)
+
+Cada `git push` a `main` actualiza el servidor solo. El pipeline está en
+[.github/workflows/desplegar.yml](.github/workflows/desplegar.yml) y corre en un
+**self-hosted runner** instalado dentro del servidor Ubuntu (servicio de systemd `actions.runner.*`).
+
+1. GitHub detecta el cambio en `main` y le pasa el trabajo al runner.
+2. El runner trae la última versión (`git fetch` + `git reset --hard origin/main`).
+3. Ejecuta `deploy/desplegar.sh`: compila, reinicia los servicios y revisa `/health`.
+4. El resultado (✅ o ❌) se ve en la pestaña **Actions** del repositorio.
+
+Instalación del runner (una vez): GitHub → Settings → Actions → Runners → *New self-hosted runner* (Linux x64),
+ejecutar los comandos de *Download* y *Configure*, y luego `sudo ./svc.sh install && sudo ./svc.sh start`.
+El usuario del servidor tiene permiso `sudo` sin contraseña **solo** para los comandos del despliegue
+(`/etc/sudoers.d/entradasya`).
 
 ## Cómo trabajar en equipo
 
